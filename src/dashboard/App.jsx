@@ -28,6 +28,7 @@ export default function App() {
   const [selectedDomain, setSelectedDomain] = useState(null);
   const [timeRange, setTimeRange] = useState(7); // 7, 30, 365
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [topSites, setTopSites] = useState([]);
 
   useEffect(() => {
     // Clock interval
@@ -52,6 +53,13 @@ export default function App() {
 
     loadData();
     const dataInterval = setInterval(loadData, 60000);
+
+    // Fetch top sites for shortcuts
+    if (chrome && chrome.topSites) {
+      chrome.topSites.get((sites) => {
+        setTopSites(sites ? sites.slice(0, 8) : []);
+      });
+    }
 
     return () => {
       clearInterval(clockInterval);
@@ -160,6 +168,35 @@ export default function App() {
               <ArrowLeft size={20} style={{ transform: 'rotate(180deg)' }} />
             </button>
           </form>
+
+          {/* Top Sites Shortcuts */}
+          {topSites.length > 0 && (
+            <div className="shortcuts-grid">
+              {topSites.map((site) => {
+                let hostname = '';
+                try { hostname = new URL(site.url).hostname.replace(/^www\./, ''); } catch { hostname = site.url; }
+                const favicon = `https://www.google.com/s2/favicons?sz=64&domain=${hostname}`;
+                return (
+                  <a key={site.url} href={site.url} className="shortcut-bubble" title={site.title}>
+                    <div className="shortcut-icon-wrap">
+                      <img
+                        src={favicon}
+                        alt={hostname}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          const span = document.createElement('span');
+                          span.className = 'fallback-letter';
+                          span.textContent = (hostname || '?')[0].toUpperCase();
+                          e.target.parentNode.appendChild(span);
+                        }}
+                      />
+                    </div>
+                    <span className="shortcut-label">{hostname}</span>
+                  </a>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
