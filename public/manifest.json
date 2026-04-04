@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Learning Tracker",
+  "version": "1.0.0",
+  "description": "Track time on learning platforms, view statistics, and maintain streaks.",
+  "permissions": [
+    "storage",
+    "tabs",
+    "idle",
+    "webNavigation",
+    "alarms"
+  ],
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "background": {
+    "service_worker": "src/background/index.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content/index.js"]
+    }
+  ],
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "action": {
+    "default_title": "Learning Tracker"
+  }
+}
