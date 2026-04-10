@@ -8,7 +8,8 @@
     "tabs",
     "idle",
     "webNavigation",
-    "alarms"
+    "alarms",
+    "topSites"
   ],
   "host_permissions": [
     "*://*/*"
